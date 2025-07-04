@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Place Order - 3M Seafood</title>
+  <link rel="stylesheet" href="shared.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="ordering-place-order.js" defer></script>
+</head>
+
+<body>
+  <div class="header-bar">
+    <h1>Place New Order</h1>
+    <p id="logged-user">Logged in as:</p>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="back-button">
+    <button onclick="window.location.href='ordering-main.html'">← Back to Dashboard</button>
+  </div>
+
+  <div class="order-section" id="order-form">
+    <h2>Seafood Products</h2>
+
+    <div class="product-row">
+      <img src="images/tanigue.jpg" alt="Tanigue" class="product-photo" />
+      <label>Tanigue (₱<span id="price-tanigue">...</span>/kg)</label>
+      <input type="number" min="1" id="qty-tanigue" placeholder="KG" />
+    </div>
+
+    <div class="product-row">
+      <img src="images/shrimp40g.jpg" alt="Shrimp 40g" class="product-photo" />
+      <label>Shrimp 40g (₱<span id="price-shrimp40g">...</span>/kg)</label>
+      <input type="number" min="1" id="qty-shrimp40g" placeholder="KG" />
+    </div>
+
+    <div class="product-row">
+      <img src="images/shrimp200g.jpg" alt="Shrimp 200/6pcs." class="product-photo" />
+      <label>Shrimp 200/6pcs. (₱<span id="price-shrimp200g">...</span>/kg)</label>
+      <input type="number" min="1" id="qty-shrimp200g" placeholder="KG" />
+    </div>
+
+    <div class="product-row">
+      <img src="images/squidM.jpg" alt="Fresh Squid (M)" class="product-photo" />
+      <label>Fresh Squid (M) (₱<span id="price-squidM">...</span>/kg)</label>
+      <input type="number" min="1" id="qty-squidM" placeholder="KG" />
+    </div>
+
+    <div class="product-row">
+      <img src="images/squidCalamari.jpg" alt="Fresh Squid (For Calamari)" class="product-photo" />
+      <label>Fresh Squid (For Calamari) (₱<span id="price-squidCalamari">...</span>/kg)</label>
+      <input type="number" min="1" id="qty-squidCalamari" placeholder="KG" />
+    </div>
+
+    <button onclick="submitOrder()" id="submitBtn">Submit Order</button>
+    <p id="status"></p>
+  </div>
+</body>
+</html>

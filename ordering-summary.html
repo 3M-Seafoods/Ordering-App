@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Order Summary - 3M Seafood</title>
+  <link rel="stylesheet" href="shared.css" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <!-- html2canvas and jsPDF fix -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- html2pdf (optional, not used in your code) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Custom scripts -->
+  <script src="firebase-init.js" defer></script>
+  <script src="ordering-summary.js" defer></script>
+</head>
+<body>
+  <div class="header-bar">
+    <h1>Order Summary</h1>
+    <p id="logged-user">Logged in as:</p>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="back-button">
+    <button onclick="window.location.href='ordering-main.html'">← Back to Dashboard</button>
+  </div>
+
+  <div class="dashboard" id="order-summary">
+    <h2>Today's Order</h2>
+    <div id="order-summary"></div>
+    <div id="delivery-status" style="margin-top: 15px;"></div>
+    <div id="action-buttons" style="margin-top: 20px;"></div>
+  </div>
+</body>
+</html>

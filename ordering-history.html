@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Order History - 3M Seafood</title>
+  <link rel="stylesheet" href="shared.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="firebase-init.js" defer></script>
+  <script src="ordering-history.js" defer></script>
+</head>
+
+<body>
+  <div class="header-bar">
+    <h1>Order History</h1>
+    <p id="logged-user">Logged in as:</p>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="back-button">
+    <button onclick="window.location.href='ordering-main.html'">← Back to Dashboard</button>
+  </div>
+
+  <div class="dashboard">
+    <h2>Past Orders</h2>
+    <label for="date-picker">Select Date:</label>
+    <input type="date" id="date-picker" onchange="loadHistory()" />
+    <div id="history-results"></div>
+  </div>
+</body>
+</html>
