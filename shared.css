@@ -126,3 +126,9 @@ img.product-photo {
 .back-button {
   margin: 15px 20px;
 }
+
+.pdf-wrapper button {
+  font-size: 10px;
+  margin-top: 5px;
+  color: #00695c;
+}
