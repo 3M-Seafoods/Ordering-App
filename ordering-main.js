@@ -11,7 +11,7 @@ auth.onAuthStateChanged(user => {
 });
 
 function logout() {
-  auth.signOut().then(() => location.href = "ordering-login.html");
+  auth.signOut().then(() => location.href = "index.html");
 }
 
 function navigate(page) {
