@@ -86,10 +86,14 @@ function loadOrders() {
 
       const actionDiv = document.createElement("div");
       actionDiv.id = `action-${orderId}`;
+
       if (order.status === "delivered") {
         actionDiv.innerHTML = `<button onclick="markAsReceived('${orderId}')">✅ Mark as Received</button>`;
       } else if (order.status === "received") {
-        actionDiv.innerHTML = `<button onclick="downloadPDF('${orderId}')">📄 Generate Receipt</button>`;
+        const btn = document.createElement("button");
+        btn.textContent = "📄 Generate Receipt";
+        btn.onclick = () => generateReceiptPreview(orderId);
+        actionDiv.appendChild(btn);
       }
 
       section.appendChild(actionDiv);
@@ -104,13 +108,14 @@ function markAsReceived(orderId) {
   }).catch(err => alert("Error: " + err.message));
 }
 
-function downloadPDF(orderId) {
+function generateReceiptPreview(orderId) {
   const section = document.getElementById(`print-section-${orderId}`);
   if (!section) return alert("Nothing to print.");
 
   const today = getTodayPH();
+
   const wrapper = document.createElement("div");
-  wrapper.id = "pdf-wrapper";
+  wrapper.className = "pdf-wrapper";
   wrapper.style.cssText = `
     width: 100%;
     max-width: 280px;
@@ -121,6 +126,7 @@ function downloadPDF(orderId) {
     font-family: Courier, monospace;
     font-size: 9px;
     text-align: center;
+    border: 1px solid #ccc;
   `;
 
   const logo = document.createElement("img");
@@ -137,12 +143,33 @@ function downloadPDF(orderId) {
 
   const dateEl = document.createElement("p");
   dateEl.textContent = `Date: ${today}`;
+
   const orderIdEl = document.createElement("p");
   orderIdEl.textContent = `Order No: ${orderId}`;
 
   const hr = document.createElement("hr");
+
   const cloned = section.cloneNode(true);
   cloned.style.cssText = "text-align: left; margin-top: 10px;";
+
+  // Replace the Generate Receipt button in the cloned copy
+  cloned.querySelectorAll("button").forEach(btn => {
+    const downloadBtn = document.createElement("button");
+    downloadBtn.textContent = "📄 Download PDF";
+    downloadBtn.style.cssText = `
+      display: inline-block;
+      margin-top: 8px;
+      font-weight: bold;
+      font-size: 10px;
+      padding: 2px 6px;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      background: #eee;
+      cursor: pointer;
+    `;
+    downloadBtn.onclick = () => downloadClonedAsPDF(wrapper, `${today}_${orderId}_Receipt.pdf`);
+    btn.replaceWith(downloadBtn);
+  });
 
   const thankYou = document.createElement("p");
   thankYou.textContent = "Thank you for your order!";
@@ -150,21 +177,46 @@ function downloadPDF(orderId) {
 
   wrapper.append(logo, title, subtitle, dateEl, orderIdEl, hr, cloned, thankYou);
   document.body.appendChild(wrapper);
+}
 
-  html2canvas(wrapper, { scale: 3, useCORS: true, windowWidth: wrapper.scrollWidth }).then(canvas => {
-    const imgData = canvas.toDataURL("image/jpeg", 1.0);
-    const pxToMm = px => px * 0.264583;
-    const pdfWidth = pxToMm(canvas.width);
-    const pdfHeight = pxToMm(canvas.height);
+function downloadClonedAsPDF(wrapperElement, filename) {
+  const clone = wrapperElement.cloneNode(true);
 
-    const pdf = new jsPDF({
-      unit: "mm",
-      format: [pdfWidth, pdfHeight],
-      orientation: "portrait"
+  // Remove any buttons in the clone to avoid recursive buttons
+  clone.querySelectorAll("button").forEach(btn => btn.remove());
+
+  // Hide clone off-screen for rendering
+  clone.style.position = "absolute";
+  clone.style.left = "-9999px";
+  document.body.appendChild(clone);
+
+  // ✅ Wait for DOM to flush
+  setTimeout(() => {
+    html2canvas(clone, {
+      scale: 3,
+      useCORS: true,
+      windowWidth: clone.scrollWidth
+    }).then(canvas => {
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      const pxToMm = px => px * 0.264583;
+      const pdfWidth = pxToMm(canvas.width);
+      const pdfHeight = pxToMm(canvas.height);
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        unit: "mm",
+        format: [pdfWidth, pdfHeight],
+        orientation: "portrait"
+      });
+
+      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(filename);
+
+      // ✅ Clean up the temporary node
+      clone.remove();
+    }).catch(err => {
+      console.error("html2canvas error:", err);
+      alert("Failed to generate PDF.");
     });
-
-    pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`${today}_${orderId}_Receipt.pdf`);
-    wrapper.remove();
-  });
+  }, 100);
 }
