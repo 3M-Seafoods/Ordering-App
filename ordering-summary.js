@@ -29,12 +29,17 @@ function loadOrders() {
   const container = document.getElementById("order-summary");
   container.innerHTML = "";
 
-  db.ref("orders").orderByChild("date").equalTo(today).once("value").then(snapshot => {
+  db.ref("orders").once("value").then(snapshot => {
     const orders = snapshot.val() || {};
-    const userOrders = Object.entries(orders).filter(([id, order]) => order.username === currentUser);
+    const userOrders = Object.entries(orders).filter(([id, order]) => {
+      const isUser = order.username === currentUser;
+      const notReceived = order.status !== "received";
+      const isTodayOrStillVisible = order.date === today || notReceived;
+      return isUser && isTodayOrStillVisible && notReceived;
+    });
 
     if (userOrders.length === 0) {
-      container.innerHTML = "<p>📭 No orders found for today.</p>";
+      container.innerHTML = "<p>📭 No active orders to show.</p>";
       return;
     }
 
@@ -152,7 +157,6 @@ function generateReceiptPreview(orderId) {
   const cloned = section.cloneNode(true);
   cloned.style.cssText = "text-align: left; margin-top: 10px;";
 
-  // Replace the Generate Receipt button in the cloned copy
   cloned.querySelectorAll("button").forEach(btn => {
     const downloadBtn = document.createElement("button");
     downloadBtn.textContent = "📄 Download PDF";
@@ -181,16 +185,11 @@ function generateReceiptPreview(orderId) {
 
 function downloadClonedAsPDF(wrapperElement, filename) {
   const clone = wrapperElement.cloneNode(true);
-
-  // Remove any buttons in the clone to avoid recursive buttons
   clone.querySelectorAll("button").forEach(btn => btn.remove());
-
-  // Hide clone off-screen for rendering
   clone.style.position = "absolute";
   clone.style.left = "-9999px";
   document.body.appendChild(clone);
 
-  // ✅ Wait for DOM to flush
   setTimeout(() => {
     html2canvas(clone, {
       scale: 3,
@@ -212,7 +211,6 @@ function downloadClonedAsPDF(wrapperElement, filename) {
       pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(filename);
 
-      // ✅ Clean up the temporary node
       clone.remove();
     }).catch(err => {
       console.error("html2canvas error:", err);
